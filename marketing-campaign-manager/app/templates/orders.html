@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>订单列表</title>
+</head>
+<body>
+    <h1>订单列表</h1>
+    <a href="{{ url_for('main.index') }}">返回首页</a>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>所属活动</th>
+                <th>客户名称</th>
+                <th>订单日期</th>
+                <th>总金额</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.campaign_id }}</td>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order.total_amount }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

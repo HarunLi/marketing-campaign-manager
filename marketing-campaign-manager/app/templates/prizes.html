@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>奖品列表</title>
+</head>
+<body>
+    <h1>奖品列表</h1>
+    <a href="{{ url_for('main.index') }}">返回首页</a>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>所属活动</th>
+                <th>奖品名称</th>
+                <th>描述</th>
+                <th>数量</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for prize in prizes %}
+            <tr>
+                <td>{{ prize.id }}</td>
+                <td>{{ prize.campaign_id }}</td>
+                <td>{{ prize.name }}</td>
+                <td>{{ prize.description or '无描述' }}</td>
+                <td>{{ prize.quantity }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

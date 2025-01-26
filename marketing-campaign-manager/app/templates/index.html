@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                统计信息
+            </div>
+            <div class="card-body">
+                <p>总活动数: {{ total_campaigns }}</p>
+                <p>总订单数: {{ total_orders }}</p>
+                <p>总奖品数: {{ total_prizes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                最近活动
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for campaign in campaigns %}
+                <li class="list-group-item">
+                    {{ campaign.name }} 
+                    <span class="badge bg-{{ 'success' if campaign.status == '进行中' else 'secondary' }}">
+                        {{ campaign.status }}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

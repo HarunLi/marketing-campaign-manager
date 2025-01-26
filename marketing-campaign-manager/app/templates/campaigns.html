@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="float-left">营销活动列表</h2>
+        <a href="{{ url_for('main.create_campaign') }}" class="btn btn-primary float-right">创建新活动</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>描述</th>
+                <th>开始日期</th>
+                <th>结束日期</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for campaign in campaigns %}
+            <tr>
+                <td>{{ campaign.id }}</td>
+                <td>{{ campaign.name }}</td>
+                <td>{{ campaign.description or '无描述' }}</td>
+                <td>{{ campaign.start_date.strftime('%Y-%m-%d') if campaign.start_date else '未设置' }}</td>
+                <td>{{ campaign.end_date.strftime('%Y-%m-%d') if campaign.end_date else '未设置' }}</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if campaign.status == '进行中' else 'secondary' }}">
+                        {{ campaign.status }}
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
