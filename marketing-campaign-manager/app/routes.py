@@ -108,6 +108,66 @@ def prizes():
     prizes = Prize.query.all()
     return render_template('prizes.html', prizes=prizes)
 
+@bp.route('/campaign/<int:campaign_id>')
+def campaign_detail(campaign_id):
+    try:
+        campaign = Campaign.query.get_or_404(campaign_id)
+        # 获取与该活动相关的订单和奖品
+        orders = Order.query.filter_by(campaign_id=campaign_id).all()
+        prizes = Prize.query.filter_by(campaign_id=campaign_id).all()
+
+        return render_template('campaign_detail.html',
+                               campaign=campaign,
+                               orders=orders,
+                               prizes=prizes)
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        return f"获取活动详情失败：{str(e)}\n{error_trace}", 500
+
+
+@bp.route('/campaign/<int:campaign_id>/edit', methods=['GET', 'POST'])
+def edit_campaign(campaign_id):
+    try:
+        campaign = Campaign.query.get_or_404(campaign_id)
+        form = CampaignForm(obj=campaign)
+
+        if form.validate_on_submit():
+            campaign.name = form.name.data
+            campaign.description = form.description.data
+            campaign.start_date = form.start_date.data
+            campaign.end_date = form.end_date.data
+            campaign.status = form.status.data
+
+            db.session.commit()
+            return redirect(url_for('main.campaign_detail', campaign_id=campaign.id))
+
+        return render_template('edit_campaign.html', form=form, campaign=campaign)
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        return f"编辑活动失败：{str(e)}\n{error_trace}", 500
+
+
+@bp.route('/campaign/<int:campaign_id>/delete', methods=['POST'])
+def delete_campaign(campaign_id):
+    try:
+        campaign = Campaign.query.get_or_404(campaign_id)
+
+        # 级联删除相关的订单和奖品
+        Order.query.filter_by(campaign_id=campaign_id).delete()
+        Prize.query.filter_by(campaign_id=campaign_id).delete()
+
+        db.session.delete(campaign)
+        db.session.commit()
+
+        return redirect(url_for('main.campaigns'))
+    except Exception as e:
+        db.session.rollback()
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        return f"删除活动失败：{str(e)}\n{error_trace}", 500
+
 
 @bp.route('/create_campaign', methods=['GET', 'POST'])
 def create_campaign():
@@ -120,8 +180,14 @@ def create_campaign():
             end_date=form.end_date.data,
             status=form.status.data
         )
-        db.session.add(campaign)
-        db.session.commit()
-        return redirect(url_for('main.campaigns'))
-    return render_template('create_campaign.html', form=form)
+        try:
+            db.session.add(campaign)
+            db.session.commit()
+            return redirect(url_for('main.campaign_detail', campaign_id=campaign.id))
+        except Exception as e:
+            db.session.rollback()
+            error_trace = traceback.format_exc()
+            print(error_trace)
+            form.name.errors.append(f"创建活动失败：{str(e)}")
 
+    return render_template('create_campaign.html', form=form)

@@ -1,38 +1,55 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-<div class="card">
-    <div class="card-header">
-        <h2 class="float-left">营销活动列表</h2>
-        <a href="{{ url_for('main.create_campaign') }}" class="btn btn-primary float-right">创建新活动</a>
+<div class="container">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2>营销活动列表</h2>
+            <a href="{{ url_for('main.create_campaign') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> 创建新活动
+            </a>
+        </div>
+        <div class="card-body">
+            {% if campaigns %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>活动名称</th>
+                        <th>开始日期</th>
+                        <th>结束日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ campaign.name }}</td>
+                        <td>{{ campaign.start_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ campaign.end_date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <span class="badge
+                                {% if campaign.status == '进行中' %}bg-success
+                                {% elif campaign.status == '未开始' %}bg-warning
+                                {% else %}bg-secondary
+                                {% endif %}">
+                                {{ campaign.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('main.campaign_detail', campaign_id=campaign.id) }}"
+                               class="btn btn-sm btn-info">详情</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-info text-center">
+                暂无营销活动，点击创建新活动开始
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>名称</th>
-                <th>描述</th>
-                <th>开始日期</th>
-                <th>结束日期</th>
-                <th>状态</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for campaign in campaigns %}
-            <tr>
-                <td>{{ campaign.id }}</td>
-                <td>{{ campaign.name }}</td>
-                <td>{{ campaign.description or '无描述' }}</td>
-                <td>{{ campaign.start_date.strftime('%Y-%m-%d') if campaign.start_date else '未设置' }}</td>
-                <td>{{ campaign.end_date.strftime('%Y-%m-%d') if campaign.end_date else '未设置' }}</td>
-                <td>
-                    <span class="badge bg-{{ 'success' if campaign.status == '进行中' else 'secondary' }}">
-                        {{ campaign.status }}
-                    </span>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 </div>
 {% endblock %}

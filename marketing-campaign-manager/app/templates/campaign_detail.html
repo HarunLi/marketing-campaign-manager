@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ campaign.name }} - 活动详情</h2>
+            <div class="actions float-right">
+                <a href="{{ url_for('main.edit_campaign', campaign_id=campaign.id) }}" class="btn btn-warning btn-sm">编辑</a>
+                <form action="{{ url_for('main.delete_campaign', campaign_id=campaign.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个活动吗？')">删除</button>
+                </form>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>基本信息</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>名称</th>
+                            <td>{{ campaign.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>描述</th>
+                            <td>{{ campaign.description or '无描述' }}</td>
+                        </tr>
+                        <tr>
+                            <th>开始日期</th>
+                            <td>{{ campaign.start_date.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        <tr>
+                            <th>结束日期</th>
+                            <td>{{ campaign.end_date.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        <tr>
+                            <th>状态</th>
+                            <td>
+                                <span class="badge bg-{{ 'success' if campaign.status == '进行中' else 'secondary' }}">
+                                    {{ campaign.status }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h4>相关订单</h4>
+                    {% if orders %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>客户名称</th>
+                                <th>订单日期</th>
+                                <th>总金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.customer_name }}</td>
+                                <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                <td>¥ {{ order.total_amount }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">暂无订单</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h4>活动奖品</h4>
+                    {% if prizes %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>奖品名称</th>
+                                <th>描述</th>
+                                <th>数量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prize in prizes %}
+                            <tr>
+                                <td>{{ prize.name }}</td>
+                                <td>{{ prize.description }}</td>
+                                <td>{{ prize.quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted">暂无奖品</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <a href="{{ url_for('main.campaigns') }}" class="btn btn-secondary">返回列表</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
